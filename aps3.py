@@ -37,6 +37,16 @@ def calc_sin_cos(x2, x1, y2, y1):
   c = (x2 - x1)/L
   return s, c
 
+# Hardcoded, mudar dps
+C_t = [[-1, 0, -1], [1, -1, 0], [0, 1, 1]]
+C = C_t.transpose()
+
+for element in nm:
+  M_e = N * C_t
+  S = (E*A/L) * (np.matmul(M_e,M_e.transpose()))/np.absolute(M_e)**2
+  K_e = []
+  K_e.append((C[element] * (np.transpose(C[element]))) * S)
+
 # [array([[-1.,  0.,  0.],
 #         [ 1.,  0.,  0.],
 #         [ 0.,  0.,  0.]]),
@@ -44,27 +54,9 @@ def calc_sin_cos(x2, x1, y2, y1):
 #         [-1.,  0.,  0.],
 #         [ 1.,  0.,  0.]])]
 
-S
- =4 = - MATRIZES DE RIGIDEZ
-# 5 =  -RIZ DE RIGIDEZ GLOBAL ( -> N #
-)K_g
-# 6 - VETOR GLOBAL DE FORÇAS CONCENT #
-C = [] 
-RADAS
-# & 7 - CON #
-for elem in nm:
-    M_e = np.zeros((2, 2))
-    S_e = (E*A/L)*(M_e*M_e.transpose())/M_e**2
-    # ...
-DIÇÃO DEC  CONTORNP
-O
-# O
-K_e = C*C.transpose() * S_e
 
-#5 = matriz de rigidex global
-BTER DESLOCAMENTOS98 - 
+# 4 - MATRIZES DE RIGIDEZ
+# 5 - MARIZ DE RIGIDEZ GLOBAL ( -> N)
+# 6 - VETOR GLOBAL DE FORÇAS CONCENTRADAS #
 
 
-# 9 - RESUL
-#K_g = Soma dos Kes
-TADOS ()UMATRIZ uU & REAÇÕES DE APOIO
