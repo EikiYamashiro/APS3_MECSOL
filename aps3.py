@@ -32,20 +32,28 @@ l = L/10
 # nr: número de restrições
 # R: vetor de restricoes
 
+
 def calc_sin_cos(x2, x1, y2, y1):
   s = (y2 - y1)/L
   c = (x2 - x1)/L
   return s, c
-
 # Hardcoded, mudar dps
 C_t = [[-1, 0, -1], [1, -1, 0], [0, 1, 1]]
-C = C_t.transpose()
+C_t = np.array([np.array(xi) for xi in C_t])
+C = np.transpose(C_t)
+M = N.dot(C_t)
+K_e = []
+for element in range(0,nm-1):
+  tem_zero = False
+  for i in M[element]:
+    if i == 0:
+      tem_zero= True
 
-for element in nm:
-  M_e = N * C_t
-  S = (E*A/L) * (np.matmul(M_e,M_e.transpose()))/np.absolute(M_e)**2
-  K_e = []
-  K_e.append((C[element] * (np.transpose(C[element]))) * S)
+  if tem_zero:
+    S = 0
+  else:
+    S = (E*A/L) * (np.matmul(M[element], np.transpose(M[element])))/np.absolute(M[element])**2
+  K_e.append((C[element] * (C_t[element])) * S)
 
 # [array([[-1.,  0.,  0.],
 #         [ 1.,  0.,  0.],
