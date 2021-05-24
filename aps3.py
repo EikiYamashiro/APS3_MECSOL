@@ -1,6 +1,6 @@
 import math
 import numpy as np
-import pandas as pd
+import pprint as pp
 from funcoesTermosol import *
 
 # Modulo de Elasticidade Longitudinal (GPa)
@@ -37,17 +37,17 @@ plota(N, Inc)
 
 def vet_conec(ne):
   conec_array = np.array(nm*[0])
-  n1 = Inc[ne-1, 0]
-  n2 = Inc[ne-1, 1]
+  n1 = int(Inc[ne-1, 0])
+  n2 = int(Inc[ne-1, 1])
   conec_array[n1 - 1] = -1
   conec_array[n2 - 1] = 1
   return conec_array
 
 def mat_conec():
-  mat_conec = np.zeros((nn, nm))
+  mat = np.zeros((nn, nm))
   for i in range(0, nn - 1):
-    mat_conec[i] = vet_conec(i)
-  return mat_conec
+    mat[i] = vet_conec(i)
+  return mat
 
 
 def calc_sin_cos(x2, x1, y2, y1):
@@ -70,24 +70,30 @@ def calc_mat_rig_L(c_e, S_e):
   return K_e
       
 def calc_Se(m_e):
-      S_e = (E*A/L)*(np.matmul(m_e, m_e.T)/(np.linalg.det(m_e))**2)
-      return S_e
+  S_e = (E*A/L)*(np.matmul(m_e.T, m_e)/(np.linalg.norm(m_e))**2)
+  if (np.linalg.norm(m_e))**2 == 0:
+    S_e = 0
+  return S_e
 
-# Hardcoded, mudar dps
-#C_t = [[-1, 0, -1], [1, -1, 0], [0, 1, 1]]
-#C = C_t.transpose()
+C = mat_conec()
+C = C.T
+M = np.matmul(N, C.T)
+# M deve ser 2X8
+print(f'M deve ser (2, {nm}) e esta {M.shape}')
 
 for element in range(0, nm - 1):
-  c_e = mat_conec()
-  m_e = np.matmul(N, c_e.T)
+  #m_e = M.T[:, element]
+  #c_e = C[:, element]
+  m_e = M[:, element]
+  m_e = np.array(m_e)[np.newaxis]
+  c_e = C[element, :]
   S_e = calc_Se(m_e)
-  list_K_e = []
   K_e = calc_mat_rig_L(c_e, S_e)
-  list_K_e.append(K_e)
+  print(K_e)
+  #pp.pprint(f'Shape do c_e: {c_e.shape}, shape do S_e: {S_e.shape}')
+  K = np.zeros((c_e.shape))
 
-print(list_K_e)
-
-
+# geraSaida(trelica, )
 # 4 - MATRIZES DE RIGIDEZ
 # 5 - MARIZ DE RIGIDEZ GLOBAL ( -> N)
 # 6 - VETOR GLOBAL DE FORÇAS CONCENTRADAS #
