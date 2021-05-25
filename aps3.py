@@ -45,6 +45,19 @@ def mat_conec():
     mat.append(vet_conec(i))
   return np.array(mat)
 
+def mat_conec_all():
+  conec = []
+  for ne in range(nm):
+    c_i = np.array(nn*[0])
+    n1 = int(Inc[ne, 0])
+    n2 = int(Inc[ne, 1])
+
+    c_i[n1 - 1] = -1
+    c_i[n2 - 1] = 1
+    conec.append(c_i)
+  C = np.array(conec)
+  return C
+
 def calc_sin_cos(x2, x1, y2, y1):
   s = (y2 - y1)/l
   c = (x2 - x1)/l
@@ -69,10 +82,8 @@ def calc_mat_rig_G(c, s, l):
   return mat_rig
 
 def calc_Ke(c_e, S_e):
-  print(c_e)
-  print(c_e.T)
   mul_C = np.matmul(c_e.T, c_e)
-  print(mul_C)
+  #print(mul_C)
   K_e = (np.kron(mul_C, S_e))
   return K_e
       
@@ -82,18 +93,51 @@ def calc_Se(m_e, l):
     S_e = np.zeros((2, 2))
   return S_e
 
-C = mat_conec()
+# def sol_Jacobi(ite, tol, K, F):
+#   M_x = np.zeros((1, 3)).T
+#   print(f'Jacobi: {M_x}')
+#   for i in range(ite):
+#     while (abs(M_x[i, i] - M_x[i, i-1])/M_x[i, i]) > tol:
+#           M_x[:, i] = 
+#     u = 0 
+#   return u
+
+def cond_contorno(Kg):
+  print((R).astype(int))
+  try:
+    K_g = np.delete(Kg, R.astype(int), 0)
+    K_g_new = np.delete(K_g, R.astype(int), 1)
+    F_new = np.delete(F, R.astype(int), 0)
+    print(f'Kg com condicoes de contorno:\n{K_g_new}')
+    print(f'F com condicoes de contorno:\n{F_new}')
+  except ValueError:
+      print( "Not Defined")
+  return K_g_new, F_new
+
+def desloc_nodais(K_g, F):
+  u = np.linalg.solve(K_g, F)
+  return u
+
+def reac_apoio(K_g, u):
+  R = np.matmul(K_g, u)
+  return R
+
+# def sol_Gauss(ite, tol, K, F):
+#     return u
+
+C = mat_conec_all()
 C_Transposto = C.T
 print(f'C:\n {C}')
 print(f'C Transposto:\n {C_Transposto}')
 print("__________________")
 M = np.matmul(N, C_Transposto)
 
-print(f'Matriz M:\n {M}')
-print("__________________")
+#print(f'Matriz M:\n {M}')
+#print("__________________")
 
 shape_Kg = 2*nn
 K_g = np.zeros((shape_Kg, shape_Kg))
+# sol_Jacobi(1, 1, 1, 1)
 for element in range(0, nm):
   #####
   m_e = (M[:, element])[np.newaxis]
@@ -105,7 +149,8 @@ for element in range(0, nm):
   #print("__________________")
   #####
   c_e = (C[:, element])[np.newaxis]
-  print(f'c_e: {c_e}')
+  c_e_transposed = c_e.T
+  #print(f'c_e: {c_e}')
   S_e = calc_Se(m_e, calc_l(element))
   #####
   print(f'Matriz S{element+1}:\n {S_e}')
@@ -119,6 +164,12 @@ for element in range(0, nm):
 
 print(f'Matriz K_g:\n {K_g}')
 print("__________________")
+
+K_g_new, F_new = cond_contorno(K_g)
+u = desloc_nodais(K_g_new, F_new)
+R = reac_apoio(K_g_new, u)
+print(u)
+
 # geraSaida(trelica, )
 # 4 - MATRIZES DE RIGIDEZ
 # 5 - MARIZ DE RIGIDEZ GLOBAL ( -> N)
