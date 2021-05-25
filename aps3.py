@@ -45,19 +45,6 @@ def mat_conec():
     mat.append(vet_conec(i))
   return np.array(mat)
 
-def mat_conec_all():
-  conec = []
-  for ne in range(nm):
-    c_i = np.array(nn*[0])
-    n1 = int(Inc[ne, 0])
-    n2 = int(Inc[ne, 1])
-
-    c_i[n1 - 1] = -1
-    c_i[n2 - 1] = 1
-    conec.append(c_i)
-  C = np.array(conec)
-  return C
-
 def calc_sin_cos(x2, x1, y2, y1):
   s = (y2 - y1)/l
   c = (x2 - x1)/l
@@ -83,7 +70,6 @@ def calc_mat_rig_G(c, s, l):
 
 def calc_Ke(c_e, S_e):
   mul_C = np.matmul(c_e.T, c_e)
-  #print(mul_C)
   K_e = (np.kron(mul_C, S_e))
   return K_e
       
@@ -93,14 +79,13 @@ def calc_Se(m_e, l):
     S_e = np.zeros((2, 2))
   return S_e
 
-# def sol_Jacobi(ite, tol, K, F):
-#   M_x = np.zeros((1, 3)).T
-#   print(f'Jacobi: {M_x}')
-#   for i in range(ite):
-#     while (abs(M_x[i, i] - M_x[i, i-1])/M_x[i, i]) > tol:
-#           M_x[:, i] = 
-#     u = 0 
-#   return u
+def sol_Jacobi(ite, tol, K, F):
+  x = np.zeros((1, 3)).T
+  D = np.diag(K)
+  R = A - np.diagflat(D)
+  for i in range(ite):
+    x = (F - np.matmul(F, x[i]))/D
+  return x
 
 def cond_contorno(Kg):
   print((R).astype(int))
@@ -125,7 +110,9 @@ def reac_apoio(K_g, u):
 # def sol_Gauss(ite, tol, K, F):
 #     return u
 
-C = mat_conec_all()
+C = mat_conec()
+#C_Transposto = np.array([[-1, 0, -1],[1, -1, 0],[0, 1, 1]])
+#C = C_Transposto.T
 C_Transposto = C.T
 print(f'C:\n {C}')
 print(f'C Transposto:\n {C_Transposto}')
@@ -148,7 +135,7 @@ for element in range(0, nm):
   #print(f'm_e_transposed:\n {m_e.T}')
   #print("__________________")
   #####
-  c_e = (C[:, element])[np.newaxis]
+  c_e = (C[element, :])[np.newaxis]
   c_e_transposed = c_e.T
   #print(f'c_e: {c_e}')
   S_e = calc_Se(m_e, calc_l(element))
@@ -169,6 +156,7 @@ K_g_new, F_new = cond_contorno(K_g)
 u = desloc_nodais(K_g_new, F_new)
 R = reac_apoio(K_g_new, u)
 print(u)
+print(R)
 
 # geraSaida(trelica, )
 # 4 - MATRIZES DE RIGIDEZ
